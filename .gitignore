@@ -1,3 +1,10 @@
+# Vim backup and temp files
+*~
+*.swp
+
+# Test program
+test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
