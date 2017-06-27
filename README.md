@@ -37,6 +37,12 @@ Dependencies
   or later
 - [_tweepy_ Twitter API wrapper](http://www.tweepy.org/): tested with v3.5.0
 
+The _requests_ and _tweepy_ libraries need to be uploaded to AWS Lambda in a
+[deployment package](http://docs.aws.amazon.com/lambda/latest/dg/lambda-python-how-to-create-deployment-package.html). Remember to install these dependencies
+via pip [at the root of the package](https://stackoverflow.com/a/40741925) and
+to set the value of the [*Handler* field in AWS Lambda](https://stackoverflow.com/a/35355800)
+to *wikiquote_tweet_awslambda.lambda_handler*.
+
 Usage
 -----
 The AWS Lambda function (`lambda_handler`) calls the
@@ -55,10 +61,10 @@ to English.
 
 Acknowledgements
 ----------------
-- Thanks to @onema for his [lambda-tweet](https://github.com/onema/lambda-tweet)
+- Thanks to @onema for the [lambda-tweet](https://github.com/onema/lambda-tweet)
 AWS Lambda application that I used as a reference on how to use tweepy
-- Thanks to @natetyles for his [wikiquotes-api](https://github.com/natetyler/wikiquotes-api)
-that I used as a reference on how to call the wikiquote.org API and parse
+- Thanks to @natetyles for the [wikiquotes-api](https://github.com/natetyler/wikiquotes-api)
+repository that I used as a reference on how to call the wikiquote.org API and parse
 its response
-
-
+- Thanks to @dev-techmoe for the [tweepy status structure gist](https://gist.github.com/dev-techmoe/ef676cdd03ac47ac503e856282077bf2)
+that I used as a reference to parse the results from tweepy
