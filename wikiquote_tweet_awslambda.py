@@ -28,11 +28,16 @@ A library to find and tweet random inspirational quotes from wikiquote.org.
 
 """
 
+import json
 import os
+import logging
 import random
 import re
 import requests
 import tweepy
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
 
 # TODO Use Unicode escape sequences for non-ASCII characters
 FORBIDDEN_SECTIONS = frozenset([
@@ -241,7 +246,7 @@ def find_quote_from_page(api, page_id):
 		}
 		
 		json = requests.post(api, data = payload).json()
-		print(json['parse']['wikitext']['*'])
+		logger.info(json['parse']['wikitext']['*'])
 		quote = find_quote_from_wikitext(json['parse']['wikitext']['*'], json['parse']['title'])
 	"""
 
@@ -385,6 +390,10 @@ def tweet_inspirational_quote(language='en'):
 	language : str
 		The tweet's language
 
+	Returns
+	-------
+	Status
+		The Status object returned by tweepy or None if no tweet was posted
 	"""
 
 	categories = {
@@ -404,6 +413,8 @@ def tweet_inspirational_quote(language='en'):
 		if len(message) < MAX_TWEET_LENGTH - MAX_TCO_URL_LENGTH:
 			message += ' ' + quote_url
 
+		logger.info('Tweeting message (' + str(len(message)) + 'chars): ' + message)
+		
 		oauth = tweepy.OAuthHandler(os.environ['TWITTER_CONSUMER_KEY'], os.environ['TWITTER_CONSUMER_SECRET'])
 		oauth.set_access_token(os.environ['TWITTER_ACCESS_TOKEN'], os.environ['TWITTER_ACCESS_SECRET'])
 		twitter = tweepy.API(oauth)
@@ -413,8 +424,10 @@ def tweet_inspirational_quote(language='en'):
 			image_url = find_image(theme, language)
 
 			if image_url:
-				temp = os.environ['TEMP_DIRECTORY'] if os.environ['TEMP_DIRECTORY'] else '/tmp'
-				image_path = + '/' + image_url.split('/')[-1]
+				logger.info('Found image for theme ' + theme + ' in language ' + language)
+
+				temp = os.environ['TEMP_DIRECTORY'] if os.getenv('TEMP_DIRECTORY') else '/tmp'
+				image_path = temp + '/' + image_url.split('/')[-1]
 				response = requests.get(image_url, stream = True)
 
 				with open(image_path, 'wb') as image:
@@ -423,15 +436,20 @@ def tweet_inspirational_quote(language='en'):
 							image.write(chunk)
 
 				with open(image_path, 'rb') as image:
-					twitter.update_with_media(filename = image_path, status = message, file = image)
+					logger.info('Found image file at ' + image_path)
+					status = twitter.update_with_media(filename = image_path, status = message, file = image)
 
 				os.remove(image_path)
 
 			else:
-				twitter.update_status(status = message)
+				logger.warn('Could not find image for theme ' + theme + ' in language ' + language)
+				status = twitter.update_status(status = message)
+
 		else:
-			print('Could not authorize Twitter account but retrieved this quote for you')
-			print(message)
+			logger.error('Could not authorize Twitter account but retrieved this quote for you')
+			logger.info(message)
+
+	return status
 
 def lambda_handler(event, context):
 	""" 
@@ -444,4 +462,20 @@ def lambda_handler(event, context):
 
 	Refer to AWS Lambda and AWS IoT button documentation for more information
 	about the event and context parameters.
+
+	Returns
+	-------
+	str
+		The URL to the tweet or None if post was unsuccessful
 	"""
+
+	logging.info('Received event: ' + json.dumps(event))
+	languages = { 'SINGLE' : 'en', 'DOUBLE' : 'es', 'LONG' : 'pt' }
+	logging.info('Language: ' + languages[event['clickType']])
+	status = tweet_inspirational_quote(languages[event['clickType']])
+	tweet = None
+
+	if status:
+		tweet = 'https://twitter.com/' + status.user.id_str + '/status/' + status.id_str
+
+	return tweet
