@@ -29,6 +29,40 @@ variables:
 Visit https://pixabay.com/api/docs/ and https://apps.twitter.com/ for
 instructions on how to obtain these keys.
 
+Setting the `PHONE_NUMBER` environment variable and allowing `sns:Publish`
+via [AWS IAM](https://console.aws.amazon.com/iam) for the lambda function
+enables sending a notification SMS with the payload sent by the button
+and the URL to the resulting tweet.
+
+The following function policy copied from the IoT example lambda functions
+allows limits [AWS SNS](https://console.aws.amazon.com/sns) publish to SMS but not topics or endpoints.
+
+```
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Effect": "Deny",
+            "Action": [
+                "sns:Publish"
+            ],
+            "Resource": [
+                "arn:aws:sns:*:*:*"
+            ]
+        }
+    ]
+}
+```
+
 Dependencies
 ------------
 - Python 3.x: tested on v3.6.1
