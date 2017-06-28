@@ -27,7 +27,7 @@ wikiquote-tweet-awslambda
 A library to find and tweet random inspirational quotes from wikiquote.org.
 
 """
-
+import boto3
 import json
 import os
 import logging
@@ -38,6 +38,8 @@ import tweepy
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+sns = boto3.client('sns')
 
 # TODO Use Unicode escape sequences for non-ASCII characters
 FORBIDDEN_SECTIONS = frozenset([
@@ -477,5 +479,19 @@ def lambda_handler(event, context):
 
 	if status:
 		tweet = 'https://twitter.com/' + status.user.id_str + '/status/' + status.id_str
+
+	phone = os.getenv('PHONE_NUMBER')
+
+	if phone:
+		message = 'Hello from your IoT Button %s. Here is the full event: %s\nTweet: ' % (event['serialNumber'], json.dumps(event))
+
+		if tweet:
+			message += tweet
+
+		sns.publish(PhoneNumber = phone, Message = message)
+		logger.info('SMS has been sent to ' + phone)
+
+	else:
+		logger.warn('Could not find phone number - no SMS sent')
 
 	return tweet
