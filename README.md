@@ -13,7 +13,7 @@ at https://aws.amazon.com/iotbutton/.
 Follow [@asTheQuoteSays](https://twitter.com/asTheQuoteSays) on Twitter for
 a demo!
 
-This code is released using the MIT license. See [LICENSE] for more details.
+This code is released using the MIT license. See [LICENSE](LICENSE) for more details.
 
 Requirements
 ------------
