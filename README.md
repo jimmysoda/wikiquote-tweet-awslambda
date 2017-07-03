@@ -28,8 +28,8 @@ variables:
 - `TWITTER_ACCESS_TOKEN`: The Twitter API access token
 - `TWITTER_ACCESS_SECRET`: The Twitter API access token secret
 
-Visit https://pixabay.com/api/docs/ and https://apps.twitter.com/ for
-instructions on how to obtain these keys.
+Visit the [Pixabay API](https://pixabay.com/api/docs/) and [Twitter API](https://apps.twitter.com/) 
+documentaiton sites for instructions on how to obtain these keys.
 
 Setting the `PHONE_NUMBER` environment variable and allowing `sns:Publish`
 via [AWS IAM](https://console.aws.amazon.com/iam) for the lambda function
