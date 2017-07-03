@@ -1,11 +1,13 @@
 # wikiquote-tweet-awslambda
- An AWS Lambda to tweet a random quote from wikiquote.org.
+ An AWS Lambda to tweet a random quote from wikiquote.org and a matching image
+ from pixabay.com upon pressing an AWS IoT Button.
 
 Summary
 -------
 
 An AWS Lambda application written in Python 3.x to tweet a randomly-selected
 inspirational quote from wikiquote.org with a matching image from pixabay.com.
+The AWS Lambda expects an event in the format sent by the AWS IoT Button.
 
 Learn more about the AWS IoT button, i.e., the programmable Amazon Dash button,
 at https://aws.amazon.com/iotbutton/.
